@@ -13,7 +13,8 @@ A startup Nova Tech, está criando um e-commerce. O time responsável pela infra
 
 ## ARQUITETURA PROPOSTA PELA EQUIPE 
 
-#####A Nova Tech nos contratou para desenvolver uma estratégia que permita ao seu e-commerce alcançar o público global de forma eficiente.
+### A Nova Tech nos contratou para desenvolver uma estratégia que permita ao seu e-commerce alcançar o público global de forma eficiente.
+
 Após uma análise detalhada, identificamos serviços cruciais, como o **Amazon CloudFront**, que oferece uma rede de distribuição de conteúdo com locais de borda estratégicos para garantir baixa latência, e o **Amazon Route 53**, que proporciona gerenciamento de DNS de forma rápida e confiável. Esses serviços são essenciais para melhorar o desempenho e a disponibilidade global do site da Nova Tech.
 
 A equipe utilizou o **AWS Well-Architected Framework** como base para a construção do e-commerce, garantindo que a solução seguisse as melhores práticas em termos de segurança, desempenho, confiabilidade, eficiência operacional, otimização de custos e sustentabilidade.
