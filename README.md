@@ -1,6 +1,5 @@
 ## Desafio da Escola da Nuvem 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/2560px-Amazon_Web_Services_Logo.svg.png" width="180" alt="AWS Logo"><img src="https://private-user-images.githubusercontent.com/136653792/383204541-77f7be3b-14de-415c-8e1e-0429f8666554.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzA4MjAwNzMsIm5iZiI6MTczMDgxOTc3MywicGF0aCI6Ii8xMzY2NTM3OTIvMzgzMjA0NTQxLTc3ZjdiZTNiLTE0ZGUtNDE1Yy04ZTFlLTA0MjlmODY2NjU1NC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQxMTA1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MTEwNVQxNTE2MTNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0zOTQ5MDNmYTgzN2QyNmZjOTIwYWE4NjNjMjNhYjNhMjcxZDYyNmIyZTIyZmMzNmZiMjk1ZmQyZDg0ZDgzNTUzJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.R6VPFzX0H309nu-hWC8CWeO1pJ6TXDNXkSikbfoteEQ" width="220" alt="Second Image">
-
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/2560px-Amazon_Web_Services_Logo.svg.png" width="180" alt="AWS Logo"><img src="https://github.com/HalleyVeras/Escola_da_Nuvem/blob/main/Documentos/download%20(4)_processed.png?raw=true" width="210" alt="Second Image">
 
 
 A startup Nova Tech, está criando um e-commerce. O time responsável pela infraestrutura decidiu contratar uma consultoria para evoluir sua arquitetura. Tendo disponível para investimento um aporte inicial de até $10.000,00 para compromissos de longo prazo, além de um orçamento mensal de $500,00 para gastos adicionais recorrentes na nuvem AWS. A Nova Tech deseja uma arquitetura baseada nas melhores práticas da AWS.
@@ -10,7 +9,7 @@ A startup Nova Tech, está criando um e-commerce. O time responsável pela infra
 
 ## Situação atual
 
-![](https://private-user-images.githubusercontent.com/136653792/383165279-a5928a62-418e-4276-99fd-c28f88a51b22.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzA4MTQzMTMsIm5iZiI6MTczMDgxNDAxMywicGF0aCI6Ii8xMzY2NTM3OTIvMzgzMTY1Mjc5LWE1OTI4YTYyLTQxOGUtNDI3Ni05OWZkLWMyOGY4OGE1MWIyMi5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQxMTA1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MTEwNVQxMzQwMTNaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1hNTRkOTIyYTI4ODVmZDRlOTk5MDZiZTUxMWYyOWFhNzE0YWVhMGVkY2ZlZjRkMWRkNmE5NTAwMTc4NTQ5MzllJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.C8AbjLL5FVb5j2hoZUrRizFt1-7nXGupzn8_cXeyDoc)
+![](https://github.com/HalleyVeras/Escola_da_Nuvem/blob/main/Documentos/imagem_2024-11-05_141524831.png?raw=true)
 
 ## ARQUITETURA PROPOSTA PELA EQUIPE 
 
@@ -47,7 +46,7 @@ Este documento visa detalhar a arquitetura da Nova Tech, incluindo a descrição
 
 ## Estrutura da Arquitetura
 
-![](https://private-user-images.githubusercontent.com/136653792/383176145-c6b9135b-081c-4087-8958-012fc476c183.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MzA4MTU2MTcsIm5iZiI6MTczMDgxNTMxNywicGF0aCI6Ii8xMzY2NTM3OTIvMzgzMTc2MTQ1LWM2YjkxMzViLTA4MWMtNDA4Ny04OTU4LTAxMmZjNDc2YzE4My5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQxMTA1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MTEwNVQxNDAxNTdaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0zY2MzY2MxYjBjNWZhODU1NjQyOThjYjRkYmEzZDdjMmM0MjE2NzIwODY2NjkzMTE3NWE3MTVlYWY0ZmNhODNmJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.14sEHAcuFZNCn9mvInyZKKK8CqK49Ol35eVzoc_OcuA)
+![](https://raw.githubusercontent.com/HalleyVeras/Escola_da_Nuvem/refs/heads/main/Documentos/Projeto_AlcanceGlobal_alteracao.png)
 
 ### 2.1. Regiões e Zonas de Disponibilidade (AZs)
 - **Região Primária:** `us-east-1` (Norte da Virgínia)
@@ -157,11 +156,17 @@ A integração com os seis pilares do Well-Architected Framework garante que a a
 [Acesse o AWS Pricing Calculator](https://calculator.aws/#/estimate?id=273402d9beda54cbad07bb8660ae7df228331fce)
 
 --- 
-## Agradecimentos
+##Agradecimentos
 Gostaríamos de expressar nossa gratidão à Escola da Nuvem e ao professor Thiago Kurimoto pelo apoio e orientação ao longo deste projeto. Agradecemos também aos colegas de equipe pela colaboração e comprometimento em construir uma solução de infraestrutura robusta e inovadora.
 
 
 ![](https://img.shields.io/github/stars/pandao/editor.md.svg) ![](https://img.shields.io/github/forks/pandao/editor.md.svg) 
 
+
+**Table of Contents**
+
+[TOCM]
+
+[TOC]
 
 
