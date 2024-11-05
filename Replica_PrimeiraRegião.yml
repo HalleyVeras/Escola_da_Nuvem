@@ -1,0 +1,222 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Template para provisionar a infraestrutura da Nova Tech na região us-east-1
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: NovaTech
+    Description: Nome do ambiente
+
+Resources:
+  # VPC e Sub-redes
+  NovaTechVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-vpc-primary"
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref NovaTechVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: us-east-1a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-public-subnet-1"
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref NovaTechVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: us-east-1b
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-public-subnet-2"
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref NovaTechVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-private-subnet-1"
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref NovaTechVPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone: us-east-1b
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-private-subnet-2"
+
+  # Internet Gateway
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-igw"
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref NovaTechVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # Route Table and Route for Public Subnets
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref NovaTechVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-public-rt"
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  # Security Group
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for EC2 instances
+      VpcId: !Ref NovaTechVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-web-sg"
+
+  # Elastic Load Balancer (ALB)
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${EnvironmentName}-alb"
+      Scheme: internet-facing
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      SecurityGroups:
+        - !Ref WebSecurityGroup
+
+  # EC2 Instances
+  WebServerInstance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.medium
+      SubnetId: !Ref PrivateSubnet1
+      SecurityGroupIds:
+        - !Ref WebSecurityGroup
+      ImageId: ami-0c55b159cbfafe1f0 # (exemplo, verificar se está disponível na região)
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-ec2-webserver-1"
+
+  WebServerInstance2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.medium
+      SubnetId: !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref WebSecurityGroup
+      ImageId: ami-0c55b159cbfafe1f0 # (exemplo, verificar se está disponível na região)
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-ec2-webserver-2"
+
+  # Auto Scaling Group
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      LaunchConfigurationName: !Ref LaunchConfiguration
+      MinSize: 1
+      MaxSize: 5
+      DesiredCapacity: 2
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-asg"
+          PropagateAtLaunch: true
+
+  LaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0c55b159cbfafe1f0
+      InstanceType: t3.medium
+      SecurityGroups:
+        - !Ref WebSecurityGroup
+
+  # Amazon RDS Instance
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      DBInstanceClass: db.t3.medium
+      Engine: MySQL
+      MasterUsername: admin
+      MasterUserPassword: password1234
+      DBName: NovaTechDB
+      MultiAZ: true
+      VPCSecurityGroups:
+        - !Ref WebSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-rds-primary"
+
+  # Amazon S3 Bucket
+  StaticContentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: nova-tech-static-content
+      AccessControl: PublicRead
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-s3-bucket"
+
+Outputs:
+  VPCId:
+    Description: ID da VPC
+    Value: !Ref NovaTechVPC
+  LoadBalancerDNS:
+    Description: URL do Load Balancer
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
