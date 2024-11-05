@@ -13,8 +13,7 @@ A startup Nova Tech, está criando um e-commerce. O time responsável pela infra
 
 ## ARQUITETURA PROPOSTA PELA EQUIPE 
 
-### A Nova Tech nos contratou para desenvolver uma estratégia que permita ao seu e-commerce alcançar o público global de forma eficiente.
-
+#####A Nova Tech nos contratou para desenvolver uma estratégia que permita ao seu e-commerce alcançar o público global de forma eficiente.
 Após uma análise detalhada, identificamos serviços cruciais, como o **Amazon CloudFront**, que oferece uma rede de distribuição de conteúdo com locais de borda estratégicos para garantir baixa latência, e o **Amazon Route 53**, que proporciona gerenciamento de DNS de forma rápida e confiável. Esses serviços são essenciais para melhorar o desempenho e a disponibilidade global do site da Nova Tech.
 
 A equipe utilizou o **AWS Well-Architected Framework** como base para a construção do e-commerce, garantindo que a solução seguisse as melhores práticas em termos de segurança, desempenho, confiabilidade, eficiência operacional, otimização de custos e sustentabilidade.
@@ -33,13 +32,7 @@ Durante o desenvolvimento do diagrama do projeto, o Well-Architected Framework f
 
 **Sustentabilidade:** Utilizando uma arquitetura serverless, algumas funções foram implementadas com AWS Lambda, o que permitiu o uso de recursos computacionais apenas quando necessário, reduzindo o desperdício e otimizando o consumo de energia.
 
-
-
-
-
 ---
-
-
 
 ## Objetivo do Documento
 Este documento visa detalhar a arquitetura da Nova Tech, incluindo a descrição dos serviços utilizados, regiões, zonas de disponibilidade, e a interconexão entre os componentes. A estrutura foi projetada para garantir a escalabilidade automática da aplicação de e-commerce, mantendo os custos controlados e a disponibilidade global.
@@ -48,7 +41,7 @@ Este documento visa detalhar a arquitetura da Nova Tech, incluindo a descrição
 
 ![](https://raw.githubusercontent.com/HalleyVeras/Escola_da_Nuvem/refs/heads/main/Documentos/Projeto_AlcanceGlobal_alteracao.png)
 
-### 2.1. Regiões e Zonas de Disponibilidade (AZs)
+### 2.1. Regiões e Zonas de Disponibilidade AZs
 - **Região Primária:** `us-east-1` (Norte da Virgínia)
   - Zonas de Disponibilidade:
     - `us-east-1a`
@@ -159,14 +152,30 @@ A integração com os seis pilares do Well-Architected Framework garante que a a
 ##Agradecimentos
 Gostaríamos de expressar nossa gratidão à Escola da Nuvem e ao professor Thiago Kurimoto pelo apoio e orientação ao longo deste projeto. Agradecemos também aos colegas de equipe pela colaboração e comprometimento em construir uma solução de infraestrutura robusta e inovadora.
 
+## Links Utéis
+
+
+| [Amazon EC2](https://aws.amazon.com/ec2/)  |  [Documentação do Amazon EC2](https://docs.aws.amazon.com/ec2/index.html)  |
+| :------------: | :------------: |
+|  [Amazon S3](https://aws.amazon.com/s3/)  |  [Documentação do Amazon S3](https://docs.aws.amazon.com/s3/index.html)  |
+|  [Amazon RDS](https://aws.amazon.com/rds/)  |  [Documentação do Amazon RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html) |
+|  [Amazon VPC](https://aws.amazon.com/vpc/)  |   [Documentação do Amazon VPC](https://docs.aws.amazon.com/vpc/index.html) |
+|  [AWS Lambda](https://aws.amazon.com/lambda/)  |  [Documentação do AWS Lambda](https://docs.aws.amazon.com/lambda/index.html)  |
+|  [Amazon CloudFront](https://aws.amazon.com/cloudfront/)  | [Documentação do Amazon CloudFront](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Welcome.html)  |
+| [Amazon API Gateway](https://aws.amazon.com/api-gateway/)  | [Documentação do Amazon API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)  |
+| [AWS IAM](https://aws.amazon.com/iam/)  | [Documentação do AWS IAM](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html)  |
+|  [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/)  | [Documentação do Amazon CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html)  |
+|  [Amazon Route 53](https://aws.amazon.com/route53/)  |  [Documentação do Amazon Route 53](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html)  |
+|  [AWS Auto Scaling](https://aws.amazon.com/autoscaling/)  |   [Documentação do AWS Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-as.html) |
+|  [Amazon ELB](https://aws.amazon.com/elasticloadbalancing/)  |  [Documentação do Amazon ELB](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html)  |
+|  [AWS CloudFormation](https://aws.amazon.com/cloudformation/)  | [Documentação do AWS CloudFormation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html)  |
+| [AWS Cost Management](https://aws.amazon.com/aws-cost-management/)  |  [Documentação do AWS Cost Management](https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-cost-management.html) |
+| [AWS Well-Architected Framework](https://aws.amazon.com/architecture/well-architected/)  |  [AWS Architecture Center](https://aws.amazon.com/architecture/) |
+
+
+
+Esses links incluem tanto a página principal dos serviços quanto a documentação detalhada, que pode ser muito útil ao desenvolver seu projeto. Se precisar de mais informações sobre algum serviço específico, fique à vontade para perguntar!
 
 ![](https://img.shields.io/github/stars/pandao/editor.md.svg) ![](https://img.shields.io/github/forks/pandao/editor.md.svg) 
-
-
-**Table of Contents**
-
-[TOCM]
-
-[TOC]
 
 
