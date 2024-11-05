@@ -150,7 +150,7 @@ A integração com os seis pilares do Well-Architected Framework garante que a a
 [Acesse o AWS Pricing Calculator](https://calculator.aws/#/estimate?id=273402d9beda54cbad07bb8660ae7df228331fce)
 
 --- 
-##Agradecimentos
+## Agradecimentos
 Gostaríamos de expressar nossa gratidão à Escola da Nuvem e ao professor Thiago Kurimoto pelo apoio e orientação ao longo deste projeto. Agradecemos também aos colegas de equipe pela colaboração e comprometimento em construir uma solução de infraestrutura robusta e inovadora.
 
 ## Links Utéis
