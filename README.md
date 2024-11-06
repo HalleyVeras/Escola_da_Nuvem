@@ -1,5 +1,10 @@
 ## Desafio da Escola da Nuvem 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/2560px-Amazon_Web_Services_Logo.svg.png" width="180" alt="AWS Logo"><img src="https://github.com/HalleyVeras/Escola_da_Nuvem/blob/main/Documentos/download%20(4)_processed.png?raw=true" width="210" alt="Second Image">
+<a href="https://aws.amazon.com/pt/?nc2=h_lg">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/2560px-Amazon_Web_Services_Logo.svg.png" width="180" alt="AWS Logo">
+</a>
+<a href="https://escoladanuvem.org">
+    <img src="https://github.com/HalleyVeras/Escola_da_Nuvem/blob/main/Documentos/download%20(4)_processed.png?raw=true" width="210" alt="Second Image">
+</a>
 
 
 A startup Nova Tech, está criando um e-commerce. O time responsável pela infraestrutura decidiu contratar uma consultoria para evoluir sua arquitetura. Tendo disponível para investimento um aporte inicial de até $10.000,00 para compromissos de longo prazo, além de um orçamento mensal de $500,00 para gastos adicionais recorrentes na nuvem AWS. A Nova Tech deseja uma arquitetura baseada nas melhores práticas da AWS.
