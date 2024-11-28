@@ -45,7 +45,7 @@ Este documento visa detalhar a arquitetura da Nova Tech, incluindo a descrição
 
 ## Estrutura da Arquitetura
 
-![](https://raw.githubusercontent.com/HalleyVeras/Escola_da_Nuvem/refs/heads/main/Documentos/Projeto_AlcanceGlobal_alteracao.png)
+![](https://github.com/HalleyVeras/Escola_da_Nuvem/blob/main/Documentos/Anima%C3%A7%C3%A3o.gif?raw=true)
 
 ### 2.1. Regiões e Zonas de Disponibilidade AZs
 - **Região Primária:** `us-east-1` (Norte da Virgínia)
