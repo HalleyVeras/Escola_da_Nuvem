@@ -128,7 +128,7 @@ Este documento visa detalhar a arquitetura da Nova Tech, incluindo a descrição
   - Controle de custos com alertas financeiros.
 
 ### 3.8. Automação de Infraestrutura
-<img src="https://seeklogo.com/images/A/aws-cloudformation-logo-11F173F931-seeklogo.com.png" width="40" alt="AWS Logo">- **AWS CloudFormation**
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqHabd5rTuhyVgdy95PmGrl4hmyUXVvZi9OA&s" width="40" alt="AWS Logo">- **AWS CloudFormation**
   - Automação do provisionamento de infraestrutura para replicação em outras regiões.
 
 
