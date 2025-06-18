@@ -1,14 +1,42 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Template para provisionar a infraestrutura da Nova Tech na região us-east-1
+Description: Template para provisionar a infraestrutura da Nova Tech na região us-east-1 com alta disponibilidade e segurança
 
 Parameters:
   EnvironmentName:
     Type: String
     Default: NovaTech
-    Description: Nome do ambiente
+    Description: Nome do ambiente (ex: Dev, Staging, Prod)
+    AllowedValues: [NovaTechDev, NovaTechStaging, NovaTechProd]
+    ConstraintDescription: Deve ser um nome de ambiente válido (Dev, Staging ou Prod)
+  
+  InstanceType:
+    Type: String
+    Default: t3.medium
+    Description: Tipo de instância EC2
+    AllowedValues: [t3.small, t3.medium, t3.large]
+  
+  DBInstanceType:
+    Type: String
+    Default: db.t3.medium
+    Description: Tipo de instância RDS
+    AllowedValues: [db.t3.small, db.t3.medium, db.t3.large]
+  
+  DBPassword:
+    Type: String
+    Description: Senha do banco de dados RDS
+    NoEcho: true
+    MinLength: 8
+    MaxLength: 64
+    AllowedPattern: "(?=^.{8,}$)((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+    ConstraintDescription: |
+      A senha deve ter pelo menos 8 caracteres, contendo letras maiúsculas,
+      minúsculas, números e caracteres especiais.
+
+Conditions:
+  IsProduction: !Equals [!Ref EnvironmentName, "NovaTechProd"]
 
 Resources:
-  # VPC e Sub-redes
+  # VPC e Sub-redes com melhores práticas de CIDR
   NovaTechVPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -17,7 +45,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Sub "${EnvironmentName}-vpc-primary"
+          Value: !Sub "${EnvironmentName}-vpc"
 
   PublicSubnet1:
     Type: AWS::EC2::Subnet
@@ -28,7 +56,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${EnvironmentName}-public-subnet-1"
+          Value: !Sub "${EnvironmentName}-public-subnet-1a"
 
   PublicSubnet2:
     Type: AWS::EC2::Subnet
@@ -39,7 +67,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${EnvironmentName}-public-subnet-2"
+          Value: !Sub "${EnvironmentName}-public-subnet-1b"
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
@@ -49,7 +77,7 @@ Resources:
       AvailabilityZone: us-east-1a
       Tags:
         - Key: Name
-          Value: !Sub "${EnvironmentName}-private-subnet-1"
+          Value: !Sub "${EnvironmentName}-private-subnet-1a"
 
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
@@ -59,7 +87,50 @@ Resources:
       AvailabilityZone: us-east-1b
       Tags:
         - Key: Name
-          Value: !Sub "${EnvironmentName}-private-subnet-2"
+          Value: !Sub "${EnvironmentName}-private-subnet-1b"
+
+  # NAT Gateway para subnets privadas
+  EIPForNAT:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt EIPForNAT.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-nat-gw"
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref NovaTechVPC
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-private-rt"
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATGateway
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
 
   # Internet Gateway
   InternetGateway:
@@ -103,11 +174,11 @@ Resources:
       SubnetId: !Ref PublicSubnet2
       RouteTableId: !Ref PublicRouteTable
 
-  # Security Group
+  # Security Groups com regras mais restritivas
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for EC2 instances
+      GroupDescription: Security group for web servers
       VpcId: !Ref NovaTechVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -118,14 +189,29 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
-        - IpProtocol: -1
-          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.0.0.0/16  # Restrito à VPC
       Tags:
         - Key: Name
           Value: !Sub "${EnvironmentName}-web-sg"
 
-  # Elastic Load Balancer (ALB)
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for RDS database
+      VpcId: !Ref NovaTechVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref WebSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-rds-sg"
+
+  # Elastic Load Balancer (ALB) com HTTPS
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -136,87 +222,175 @@ Resources:
         - !Ref PublicSubnet2
       SecurityGroups:
         - !Ref WebSecurityGroup
+      Type: application
+      IpAddressType: ipv4
 
-  # EC2 Instances
-  WebServerInstance1:
-    Type: AWS::EC2::Instance
+  ALBListenerHTTP:
+    Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      InstanceType: t3.medium
-      SubnetId: !Ref PrivateSubnet1
-      SecurityGroupIds:
-        - !Ref WebSecurityGroup
-      ImageId: ami-0c55b159cbfafe1f0 # (exemplo, verificar se está disponível na região)
-      Tags:
-        - Key: Name
-          Value: !Sub "${EnvironmentName}-ec2-webserver-1"
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
 
-  WebServerInstance2:
-    Type: AWS::EC2::Instance
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      InstanceType: t3.medium
-      SubnetId: !Ref PrivateSubnet2
-      SecurityGroupIds:
-        - !Ref WebSecurityGroup
-      ImageId: ami-0c55b159cbfafe1f0 # (exemplo, verificar se está disponível na região)
-      Tags:
-        - Key: Name
-          Value: !Sub "${EnvironmentName}-ec2-webserver-2"
+      Name: !Sub "${EnvironmentName}-tg"
+      Port: 80
+      Protocol: HTTP
+      VpcId: !Ref NovaTechVPC
+      HealthCheckPath: /health
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      TargetType: instance
 
-  # Auto Scaling Group
+  # Auto Scaling Group com políticas de scaling
   AutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       VPCZoneIdentifier:
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
-      LaunchConfigurationName: !Ref LaunchConfiguration
-      MinSize: 1
-      MaxSize: 5
-      DesiredCapacity: 2
+      LaunchTemplate:
+        LaunchTemplateId: !Ref WebServerLaunchTemplate
+        Version: !GetAtt WebServerLaunchTemplate.LatestVersionNumber
+      MinSize: !If [IsProduction, 2, 1]
+      MaxSize: !If [IsProduction, 6, 3]
+      DesiredCapacity: !If [IsProduction, 3, 2]
+      TargetGroupARNs:
+        - !Ref ALBTargetGroup
       Tags:
         - Key: Name
           Value: !Sub "${EnvironmentName}-asg"
           PropagateAtLaunch: true
+      Policies:
+        - PolicyName: !Sub "${EnvironmentName}-scale-out-policy"
+          PolicyType: TargetTrackingScaling
+          TargetTrackingConfiguration:
+            PredefinedMetricSpecification:
+              PredefinedMetricType: ASGAverageCPUUtilization
+            TargetValue: 70.0
+        - PolicyName: !Sub "${EnvironmentName}-scale-in-policy"
+          PolicyType: TargetTrackingScaling
+          TargetTrackingConfiguration:
+            PredefinedMetricSpecification:
+              PredefinedMetricType: ASGAverageCPUUtilization
+            TargetValue: 30.0
 
-  LaunchConfiguration:
-    Type: AWS::AutoScaling::LaunchConfiguration
+  WebServerLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
     Properties:
-      ImageId: ami-0c55b159cbfafe1f0
-      InstanceType: t3.medium
-      SecurityGroups:
-        - !Ref WebSecurityGroup
+      LaunchTemplateName: !Sub "${EnvironmentName}-launch-template"
+      LaunchTemplateData:
+        InstanceType: !Ref InstanceType
+        ImageId: ami-0c55b159cbfafe1f0  # Amazon Linux 2 - atualizar conforme região
+        SecurityGroupIds:
+          - !Ref WebSecurityGroup
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: !Sub "${EnvironmentName}-webserver"
+        UserData: 
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install -y httpd
+            systemctl start httpd
+            systemctl enable httpd
 
-  # Amazon RDS Instance
+  # Amazon RDS Instance com melhores configurações
+  RDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-rds-subnet-group"
+
   RDSInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      AllocatedStorage: 20
-      DBInstanceClass: db.t3.medium
+      AllocatedStorage: !If [IsProduction, 100, 20]
+      DBInstanceClass: !Ref DBInstanceType
       Engine: MySQL
+      EngineVersion: "8.0"
       MasterUsername: admin
-      MasterUserPassword: password1234
+      MasterUserPassword: !Ref DBPassword
       DBName: NovaTechDB
-      MultiAZ: true
+      MultiAZ: !If [IsProduction, true, false]
+      StorageType: gp3
+      DBSubnetGroupName: !Ref RDSSubnetGroup
       VPCSecurityGroups:
-        - !Ref WebSecurityGroup
+        - !GetAtt RDSSecurityGroup.GroupId
+      BackupRetentionPeriod: !If [IsProduction, 7, 3]
       Tags:
         - Key: Name
-          Value: !Sub "${EnvironmentName}-rds-primary"
+          Value: !Sub "${EnvironmentName}-rds"
 
-  # Amazon S3 Bucket
+  # Amazon S3 Bucket com versionamento e logging
   StaticContentBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: nova-tech-static-content
-      AccessControl: PublicRead
+      BucketName: !Sub "${EnvironmentName}-static-content-${AWS::AccountId}"
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Sub "${EnvironmentName}-logs-${AWS::AccountId}"
+        LogFilePrefix: "s3/"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       Tags:
         - Key: Name
-          Value: !Sub "${EnvironmentName}-s3-bucket"
+          Value: !Sub "${EnvironmentName}-static-content"
+
+  LogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${EnvironmentName}-logs-${AWS::AccountId}"
+      AccessControl: LogDeliveryWrite
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${EnvironmentName}-logs"
 
 Outputs:
   VPCId:
     Description: ID da VPC
     Value: !Ref NovaTechVPC
+    Export:
+      Name: !Sub "${EnvironmentName}-VPCID"
+  
   LoadBalancerDNS:
     Description: URL do Load Balancer
     Value: !GetAtt ApplicationLoadBalancer.DNSName
+    Export:
+      Name: !Sub "${EnvironmentName}-ALBDNS"
+  
+  DatabaseEndpoint:
+    Description: Endpoint do banco de dados RDS
+    Value: !GetAtt RDSInstance.Endpoint.Address
+    Export:
+      Name: !Sub "${EnvironmentName}-DBEndpoint"
+  
+  StaticContentBucketName:
+    Description: Nome do bucket S3 para conteúdo estático
+    Value: !Ref StaticContentBucket
+    Export:
+      Name: !Sub "${EnvironmentName}-StaticBucket"
